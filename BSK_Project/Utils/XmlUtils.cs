@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Xml;
 using Org.BouncyCastle.Crypto.Paddings;
@@ -44,6 +45,7 @@ namespace BSK_Project.Utils
 
                 writer.WriteElementString(Constants.Content,
                     BitConverter.ToString(encryptedBytes).Replace("-", string.Empty));
+               
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
             }
@@ -116,7 +118,8 @@ namespace BSK_Project.Utils
 
         public static byte[] GetEncryptedContent(string fileName)
         {
-            
+          
+         
             using (var reader = XmlReader.Create(fileName))
             {
                 while (reader.Read())
@@ -126,8 +129,11 @@ namespace BSK_Project.Utils
                         if (reader.Name.Equals(Constants.Content))
                         {
                             reader.Read();
-                            var content = reader.Value;
-                            return StringToByteArray(content);
+                            int size = reader.Value.Length;
+                                byte[] result = new byte[size/2];
+                            reader.ReadContentAsBinHex(result, 0, size/2);
+                            return result;
+
 
                         }
                     }

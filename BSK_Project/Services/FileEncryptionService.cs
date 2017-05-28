@@ -9,13 +9,16 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.Security;
 
 namespace BSK_Project
 {
     internal class FileEncryptionService
     {
-        
+
         public byte[] GenerateKey(int size)
         {
             var sessionKeyGenerator = new RNGCryptoServiceProvider();
@@ -33,6 +36,33 @@ namespace BSK_Project
             return keyParameter;
         }
 
+        public AsymmetricKeyParameter GetPublicKey2(string email)
+        {
+
+            byte[] publicKey = File.ReadAllBytes(Constants.PublicKeysFolderPath + email);
+
+            var deserializedKey = PublicKeyFactory.CreateKey(publicKey);
+
+            return deserializedKey;
+
+        }
+
+        public AsymmetricKeyParameter GetPrivateKey(string email)
+        {
+            var fileStream = File.OpenText(Constants.PrivateKeysFolderPath + email);
+            var pemReader = new PemReader(fileStream);
+            var keyParameter = (AsymmetricCipherKeyPair)pemReader.ReadObject();
+            return keyParameter.Private;
+        }
+
+        public AsymmetricKeyParameter GetPrivateKey2(string email)
+        {
+            byte[] privateKey = File.ReadAllBytes(Constants.PrivateKeysFolderPath + email);
+            var deserializedKey = PrivateKeyFactory.CreateKey(privateKey);
+            return deserializedKey;
+
+        }
+
         public byte[] GetEncryptedByRsaSessionKey(AsymmetricKeyParameter keyParameter, byte[] sessionKey)
         {
             var encryptEngine = new RsaEngine();
@@ -45,12 +75,12 @@ namespace BSK_Project
             return encrypted;
         }
 
-        public byte[] GetDecryptedByRsaSessionKey(AsymmetricKeyParameter keyParameter, byte[] sessionKey)
+        public byte[] GetDecryptedByRsaSessionKey(AsymmetricKeyParameter keyParameter, byte[] key)
         {
             var encryptEngine = new RsaEngine();
             encryptEngine.Init(false, keyParameter);
-            var decrypted = encryptEngine.ProcessBlock(sessionKey, 0, sessionKey.Length);
-            sessionKey = null;
+            var decrypted = encryptEngine.ProcessBlock(key, 0, key.Length);
+            key = null;
             return decrypted;
         }
 

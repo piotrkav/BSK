@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using BSK_Project.Utils;
 using Microsoft.Win32;
+using Org.BouncyCastle.Security;
 using static BSK_Project.CipherMode;
 
 namespace BSK_Project
@@ -15,6 +17,7 @@ namespace BSK_Project
     /// </summary>
     public partial class MainWindow : Window
     {
+        private byte[] sessionKeyTEST;
         private AlgorithmDetails _fileToDecryptAlgorithmDetails;
 
         string _fileToEncryptPath;
@@ -23,7 +26,7 @@ namespace BSK_Project
         string _fileToDecryptPath;
         string _fileToSaveDecryptedPath;
 
-        
+
         byte[] _fileToBeEncrypted;
         byte[] _encryptedFile;
         byte[] fileToBeDecrypted;
@@ -103,30 +106,30 @@ namespace BSK_Project
             var mode = (CipherModes)CipherModeComboBox.SelectedItem;
             var iv = fileEncryptionService.GenerateKey(128);
             var subLength = (int)SubBlockSizeComboBox.SelectedItem;
-           
+
 
 
 
             var sessionKey = fileEncryptionService.GenerateKey(size);
-
-            _encryptedFile = TwoFishUtils.TwoFishEncryption(mode, _fileToBeEncrypted, sessionKey, iv, 0);
+            //sessionKeyTEST = sessionKey;
+            _encryptedFile = TwoFishUtils.TwoFishEncryption(mode, _fileToBeEncrypted, sessionKey, iv, subLength);
 
             var usersEncryptedSessionKeys = new SortedDictionary<string, byte[]>();
             foreach (var user in choosenUserListBox.Items)
             {
                 var userName = user.ToString();
-                var publicKey = fileEncryptionService.GetPublicKey(userName);
+                var publicKey = fileEncryptionService.GetPublicKey2(userName);
                 var encryptedSessionKeyPerUser = fileEncryptionService.GetEncryptedByRsaSessionKey(publicKey, sessionKey);
-                usersEncryptedSessionKeys.Add(userName,encryptedSessionKeyPerUser);
+                usersEncryptedSessionKeys.Add(userName, encryptedSessionKeyPerUser);
 
             }
 
             var algorithmDetails = new AlgorithmDetails(Constants.TwoFish, mode, size, iv, subLength,
                 usersEncryptedSessionKeys);
-            
-            XmlUtils.CreateXml(_fileToSaveEncryptedPath, algorithmDetails,_encryptedFile);
+
+            XmlUtils.CreateXml(_fileToSaveEncryptedPath, algorithmDetails, _encryptedFile);
             sessionKey = null;
-           //TwoFishUtils.SaveData(_fileToSaveEncryptedPath, _encryptedFile);
+            //TwoFishUtils.SaveData(_fileToSaveEncryptedPath, _encryptedFile);
 
 
 
@@ -148,14 +151,14 @@ namespace BSK_Project
             _fileToDecryptPath = dlg.FileName;
             FileToDecrypt.Text = _fileToDecryptPath;
 
-           _fileToDecryptAlgorithmDetails =  XmlUtils.GetAlgorithmDetails(_fileToDecryptPath);
+            _fileToDecryptAlgorithmDetails = XmlUtils.GetAlgorithmDetails(_fileToDecryptPath);
             foreach (var user in _fileToDecryptAlgorithmDetails.UserSessionKeysDictionary)
             {
                 allowedUsersToDecryptComboBox.Items.Add(user.Key);
             }
 
-           
-            fileToBeDecrypted = System.IO.File.ReadAllBytes(_fileToDecryptPath);
+
+            fileToBeDecrypted = XmlUtils.GetEncryptedContent(_fileToDecryptPath);
         }
 
         private void fileToSaveDecryptChooser_Click(object sender, RoutedEventArgs e)
@@ -216,10 +219,25 @@ namespace BSK_Project
 
         private void DecryptButton_Click_1(object sender, RoutedEventArgs e)
         {
+            FileEncryptionService service = new FileEncryptionService();
+
             var passwordHashed = HashUtil.GenerateSha256Hash(passwordToDecryptBox.Password);
-            var _decryptedBytes = TwoFishUtils.TwoFishPrivateKeyDecryption(CipherModes.Ecb, _fileToBeEncrypted, _fileToDecryptAlgorithmDetails.UserSessionKeysDictionary.GetEnumerator().Current.Value, null, 0);
-            TwoFishUtils.SaveData(_fileToSaveDecryptedPath, _decryptedBytes);
-            
+            var user = allowedUsersToDecryptComboBox.SelectedItem.ToString();
+
+            var privateKey = service.GetPrivateKey2(user);
+            var privateKeyDecrypted = service.GetDecryptedByRsaSessionKey(privateKey, passwordHashed);
+
+            var x = PrivateKeyFactory.CreateKey(privateKeyDecrypted);
+
+            var sessionKey = _fileToDecryptAlgorithmDetails.UserSessionKeysDictionary[user];
+            var decryptedSessionKey = service.GetDecryptedByRsaSessionKey(x, sessionKey);
+
+            var fileDone = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
+                fileToBeDecrypted, decryptedSessionKey, _fileToDecryptAlgorithmDetails.Iv,
+                _fileToDecryptAlgorithmDetails.BlockSize);
+
+            File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);
+
 
         }
 
@@ -227,10 +245,10 @@ namespace BSK_Project
         {
             Console.WriteLine(allowedUsersToDecryptComboBox.SelectedItem.ToString());
             var selectedUser = allowedUsersToDecryptComboBox.SelectedItem.ToString();
-            _userPrivateKey  = System.IO.File.ReadAllBytes(Constants.PrivateKeysFolderPath + selectedUser);
+            _userPrivateKey = System.IO.File.ReadAllBytes(Constants.PrivateKeysFolderPath + selectedUser);
 
             Console.WriteLine(_userPrivateKey);
-        
+
         }
     }
 }

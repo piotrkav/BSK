@@ -19,7 +19,7 @@ namespace BSK_Project
     {
         private readonly Encoding _encoding;
 
-        public BCEngine( Encoding encoding)
+        public BCEngine(Encoding encoding)
         {
 
             _encoding = encoding;
@@ -34,53 +34,56 @@ namespace BSK_Project
         {
             byte[] result;
             var cipher = CipherUtils.CreateTwofishCipher(forEncrypt, mode, key, iv, subLength);
+            byte[] output = new byte[cipher.GetOutputSize(input.Length)];
+            int len = cipher.ProcessBytes(input, 0, input.Length, output, 0);
+            cipher.DoFinal(output, len);
+            return output;
+            //if (forEncrypt)
+            //{
+            //    byte[] _in = input;
+            //    byte[] _out = new byte[cipher.GetOutputSize(_in.Length)];
+            //    int len1 = cipher.ProcessBytes(_in, 0, _in.Length, _out, 0);
+            //    cipher.DoFinal(_out, len1);
+            //    result = _out;
+            //}
+            //else
+            //{
+            //    byte[] _in = input;
+            //    byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
+            //    int len = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
+            //    len += cipher.DoFinal(temp, len);
 
-            if (forEncrypt)
-            {
-                byte[] _in = input;
-                byte[] _out = new byte[cipher.GetOutputSize(_in.Length)];
-                int len1 = cipher.ProcessBytes(_in, 0, _in.Length, _out, 0);
-                cipher.DoFinal(_out, len1);
-                result = _out;
-            }
-            else
-            {
-                byte[] _in = input;
-                byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
-                int len = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
-                len += cipher.DoFinal(temp, len + 2);
+            //    result = TransferBytes(len, temp);
+            //    //cipher.ProcessBytes(input);
+            //    //return cipher.DoFinal(input);
 
-                result = TransferBytes(len, temp);
-                //cipher.ProcessBytes(input);
-                //return cipher.DoFinal(input);
-
-            }
-            return result;
+            //}
+            //return result;
 
 
         }
 
-        public byte[] TransferBytes(int size, byte[] bytesIn)
-        {
-            byte[] result = new byte[size];
+        //public byte[] TransferBytes(int size, byte[] bytesIn)
+        //{
+        //    byte[] result = new byte[size];
 
-            for (int i = 0; i < size; i++)
-            {
-                result[i] = bytesIn[i];
-            }
+        //    for (int i = 0; i < size; i++)
+        //    {
+        //        result[i] = bytesIn[i];
+        //    }
 
-            return result;
-        }
-public string Encrypt(CipherModes mode, string plain, string key, byte[] iv, int sublength)
+        //    return result;
+        //}
+        public string Encrypt(CipherModes mode, string plain, string key, byte[] iv, int sublength)
         {
-            byte[] result = BouncyCastleCrypto(true,mode, _encoding.GetBytes(plain),  _encoding.GetBytes(key),iv, sublength);
+            byte[] result = BouncyCastleCrypto(true, mode, _encoding.GetBytes(plain), _encoding.GetBytes(key), iv, sublength);
             return Convert.ToBase64String(result);
         }
-        public byte[] Encrypt(CipherModes mode,string plain, byte[] key,byte[] iv,int sublength)
+        public byte[] Encrypt(CipherModes mode, string plain, byte[] key, byte[] iv, int sublength)
         {
             return BouncyCastleCrypto(true, mode, _encoding.GetBytes(plain), key, iv, sublength);
         }
-        public byte[] Encrypt(CipherModes mode,byte[] plain, string key, byte[] iv, int sublength)
+        public byte[] Encrypt(CipherModes mode, byte[] plain, string key, byte[] iv, int sublength)
         {
             return BouncyCastleCrypto(true, mode, plain, _encoding.GetBytes(key), iv, sublength);
         }
@@ -89,13 +92,6 @@ public string Encrypt(CipherModes mode, string plain, string key, byte[] iv, int
             return BouncyCastleCrypto(true, mode, plain, key, iv, sublength);
         }
 
-        public byte[] Decrypt(byte[] input, string key)
-        {
-            CipherModes mode = CipherModes.Cbc ;
-            byte[] iv = new byte[4];
-            int sublength = 2;
-            return BouncyCastleCrypto(false, mode, input, _encoding.GetBytes(key), iv, sublength);
-        }
 
         //public string Decrypt(string cipher, string key)
         //{

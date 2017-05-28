@@ -1,15 +1,23 @@
-﻿using Org.BouncyCastle.Crypto;
+﻿using System;
+using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Prng;
 using Org.BouncyCastle.OpenSsl;
 using Org.BouncyCastle.Security;
 using System.IO;
+using System.Security.Cryptography;
+using System.Text;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Asn1.Pkcs;
+using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Pkcs;
+using Org.BouncyCastle.X509;
 using static BSK_Project.CipherMode;
 
 namespace BSK_Project
 {
 
-   internal class UserCreateService
+    internal class UserCreateService
     {
         private readonly string _email;
         private byte[] _password;
@@ -23,17 +31,62 @@ namespace BSK_Project
 
         public void AddUser()
         {
+            //keys
             var keys = GetKeyPair(Constants.RsaKeySize);
-            var publicKey = keys.Public;
+            
+            //private
+            PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(keys.Private);
+            byte[] serializedPrivateBytes = privateKeyInfo.ToAsn1Object().GetDerEncoded();
+            string serializedPrivate = Convert.ToBase64String(serializedPrivateBytes);
+            //public
+            SubjectPublicKeyInfo publicKeyInfo = SubjectPublicKeyInfoFactory.CreateSubjectPublicKeyInfo(keys.Public);
+            byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
+            string serializedPublic = Convert.ToBase64String(serializedPublicBytes);
 
+            
+            //paths
             var publicPath = Constants.PublicKeysFolderPath + _email;
             var privatePath = Constants.PrivateKeysFolderPath + _email;
-            File.WriteAllText(publicPath, TwoFishUtils.ConvertKeyToString(publicKey));
+            //save keys to files
 
-            var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, TwoFishUtils.ConvertKeyToString(keys.Private), _password,null,0);
-            _password = null;
-            TwoFishUtils.SaveData(privatePath, privateKey);
+
+            // Console.WriteLine("public key" + serializedPublic);
+            File.WriteAllBytes(publicPath, serializedPublicBytes);
+
+            var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
+            File.WriteAllBytes(privatePath, privateKey);
             privateKey = null;
+            // Console.WriteLine("private key" + serializedPrivate);
+            // privateKey = null;
+            //TwoFishUtils.ConvertKeyToString(publicKey));
+            // 
+
+
+            //CHECK OF READING KEYS FROM FILES
+
+            //var puk = File.ReadAllBytes(publicPath);
+            //AsymmetricKeyParameter deserializedKey1 = PublicKeyFactory.CreateKey(puk);
+            //var puk2 = File.ReadAllBytes(privatePath);
+
+
+            //AsymmetricKeyParameter deserializedKey2 = PrivateKeyFactory.CreateKey(puk2);
+            //if (keys.Public.Equals(deserializedKey1))
+            //{
+            //    Console.WriteLine("TRUE");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("FALSE");
+            //}
+            //if (keys.Private.Equals(deserializedKey2))
+            //{
+            //    Console.WriteLine("true");
+            //}
+            //else
+            //{
+            //    Console.WriteLine("false");
+            //}
+
 
         }
 
@@ -50,13 +103,13 @@ namespace BSK_Project
             var keyGenerationParameters = new KeyGenerationParameters(secureRandom, rsaKeySize);
 
             var keyPairGenerator = new RsaKeyPairGenerator();
-            
+
             keyPairGenerator.Init(keyGenerationParameters);
             var keys = keyPairGenerator.GenerateKeyPair();
             return keys;
         }
 
-      
+
 
     }
 }

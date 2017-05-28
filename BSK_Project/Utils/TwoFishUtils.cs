@@ -13,14 +13,7 @@ namespace BSK_Project
     {
 
 
-
-        //public static string TwoFishEncryption(CipherModes mode,string plain, string key, byte[] iv, int subLength)
-        //{
-        //    BCEngine bcEngine = new BCEngine(Encoding.UTF8);
-
-        //    return bcEngine.Encrypt(mode, plain, key,iv,subLength);
-        //}
-
+        //ENCRYPTION
         public static byte[] TwoFishEncryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
         {
             BCEngine bcEngine = new BCEngine(Encoding.ASCII);
@@ -34,19 +27,39 @@ namespace BSK_Project
 
             return bcEngine.Encrypt(mode, plain, key, iv, subLength);
         }
-
-        public static byte[] TwoFishPrivateKeyDecryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
+        public static byte[] TwoFishPrivateKeyEncryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
         {
             BCEngine bcEngine = new BCEngine(Encoding.ASCII);
-
-            return bcEngine.Decrypt(mode, plain, key, iv, subLength);
+            return bcEngine.Encrypt(mode, plain, key, iv, subLength);
         }
+       
+
+
+
         public static byte[] TwoFishFileEncryption(CipherModes mode, byte[] plain, string key, byte[] iv, int subLength)
         {
             BCEngine bcEngine = new BCEngine(Encoding.ASCII);
 
             return bcEngine.Encrypt(mode, plain, key, iv, subLength);
         }
+        
+
+        //DECRYPTION
+        public static byte[] TwoFishFileDecryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
+        {
+            BCEngine bcEngine = new BCEngine(Encoding.ASCII);
+
+            return bcEngine.Decrypt(mode, plain, key, iv, subLength);
+
+        }
+        public static byte[] TwoFishPrivateKeyDecryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
+        {
+            BCEngine bcEngine = new BCEngine(Encoding.ASCII);
+
+            return bcEngine.Decrypt(mode, plain, key, iv, subLength);
+        }
+
+
 
         internal static bool SaveData(string fileName, byte[] data)
         {
@@ -71,33 +84,19 @@ namespace BSK_Project
             return true;
         }
 
+
+
         public static string ConvertKeyToString(AsymmetricKeyParameter key)
         {
-            TextWriter textWriter = new StringWriter();
+            string result = "";
+            StringBuilder sb=  new StringBuilder(result);
+            TextWriter textWriter = new StringWriter(sb);
             var pemWriter = new PemWriter(textWriter);
             pemWriter.WriteObject(key);
             pemWriter.Writer.Flush();
 
-            var convertedKey = textWriter.ToString();
-            return convertedKey;
+            return result;
         }
-        
-        //public static string TwoFishDecryption(string cipher, string key, bool fips)
-        //{
-        //    BCEngine bcEngine = new BCEngine(new TwofishEngine(), Encoding.ASCII);
-        //    bcEngine.SetPadding(new Pkcs7Padding());
-        //    return bcEngine.Decrypt(cipher, key);
-        //}
-
-        //public static byte[] TwoFishFileDecryption(byte[] cipher, string key, bool fips)
-        //{
-        //    BCEngine bcEngine = new BCEngine(new TwofishEngine(), Encoding.ASCII);
-        //    bcEngine.SetPadding(new Pkcs7Padding());
-        //    return bcEngine.Decrypt(cipher, key);
-        //}
-
-
-
 
     }
 }
