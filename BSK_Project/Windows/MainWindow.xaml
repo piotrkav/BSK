@@ -1,0 +1,168 @@
+﻿<Window x:Class="BSK_Project.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BSK_Project"
+        mc:Ignorable="d"
+        Title="Algorytm TwoFish" Height="480.5" Width="525">
+    <Grid Margin="0,0,0,8">
+        <Menu x:Name="menu" HorizontalAlignment="Left" Height="26" VerticalAlignment="Top" Width="517">
+            <Menu Width="Auto" Height="20">
+                <MenuItem Header="_Plik">
+                    <MenuItem x:Name="AppExit" Header="Wyjdź" HorizontalAlignment="Left" Width="140" Click="AppExit_Click"/>
+                </MenuItem>
+
+                <MenuItem Header="_Pomoc">
+                    <MenuItem x:Name="About" Header="O programie" HorizontalAlignment="Left" Width="160"/>
+                    <MenuItem x:Name="Help" Header="Zobacz pomoc" HorizontalAlignment="Left" Width="165"/>
+
+                </MenuItem>
+            </Menu>
+        </Menu>
+        <TabControl Margin="0,31,0,0" SelectionChanged="TabControl_SelectionChanged" >
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+
+                        <TextBlock Text="Szyfrowanie" Foreground="Blue" />
+                    </StackPanel>
+                </TabItem.Header>
+
+                <Label Margin="0,7,-18,-7" >
+                    <Grid>
+
+                        <GroupBox  x:Name="groupBox" Header="Plik" Height="83" Width="501" Grid.ColumnSpan="2">
+                            <Grid>
+                                <Button x:Name="filePickerButton" Content="Wybierz" HorizontalAlignment="Left" Margin="419,6,0,0" VerticalAlignment="Top" Width="60" Click="filePickerButton_Click"/>
+                                <Border BorderThickness="1" BorderBrush="LightGray" Margin="132,0,75,31">
+                                    <TextBlock Background="White" x:Name ="fileToEncrypt" Text="Wybierz plik do szyfrowania..." HorizontalAlignment="Right" Height="15" Margin="0,4,9,9" TextWrapping="Wrap" VerticalAlignment="Center" Width="263"/>
+
+                                </Border>
+                                <Border BorderThickness="1" BorderBrush="LightGray" Margin="132,31,75,0">
+                                    <TextBlock Background="White" x:Name ="fileToSaveEncrypt" Text="Wybierz plik wynikowy..." HorizontalAlignment="Left" Height="15" Margin="9,4,0,9" TextWrapping="Wrap" VerticalAlignment="Center" Width="262"/>
+
+                                </Border>
+                                <Button x:Name="filePickerToSaveButton" Content="Wybierz" HorizontalAlignment="Left" Margin="419,37,0,0" Width="60" Height="20" VerticalAlignment="Top" Click="filePickerToSaveButton_Click"/>
+                                <Label x:Name="label" Content="Plik wejściowy:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115"/>
+                                <Label x:Name="label_Copy" Content="Plik wyjściowy:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115" Margin="0,31,0,0"/>
+
+
+                            </Grid>
+                        </GroupBox>
+                        <Label Margin="0,90,0,-97" >
+                            <GroupBox x:Name="groupBox2" Header="Twofish - Ustawienia" Height="84" Width="489">
+                                <Grid Margin="0,0,1,-19">
+                                    <Label x:Name="CipherModeLabel" Content="Tryb pracy:" HorizontalAlignment="Left" Margin="3,9,0,0" VerticalAlignment="Top" Width="69"/>
+                                    <ComboBox x:Name="CipherModeComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="11,35,0,0" VerticalAlignment="Top" Width="64" SelectionChanged="comboBox_SelectionChanged" RenderTransformOrigin="0.531,0.682">
+                                    </ComboBox>
+                                    <Label x:Name="KeyLengthLabel" Content="Długość klucza:" HorizontalAlignment="Left" Margin="120,10,0,0" VerticalAlignment="Top" Width="96"/>
+                                    <ComboBox x:Name="keyLengthComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="125,36,0,0" VerticalAlignment="Top" Width="87" SelectionChanged="comboBox_SelectionChanged">
+
+                                    </ComboBox>
+                                    <Label x:Name="BlockSizeLabel" Content="Długość bloku:" HorizontalAlignment="Left" Margin="244,10,0,0" VerticalAlignment="Top" Width="96"/>
+                                    <ComboBox x:Name="BlockSizeComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="251,34,0,0" VerticalAlignment="Top" Width="87" SelectionChanged="comboBox_SelectionChanged" IsEnabled="False">
+                                        <ComboBoxItem Content="128"  HorizontalAlignment="Left" Width="92"/>
+                                    </ComboBox>
+
+                                    <ComboBox SelectedIndex="0" x:Name="SubBlockSizeComboBox" HorizontalAlignment="Left" Margin="356,35,0,0" VerticalAlignment="Top" Width="90"/>
+                                    <Label x:Name="SubBlockSizeLabel" Content="Długość podbloku:" HorizontalAlignment="Left" VerticalAlignment ="Top" Margin="356,10,0,0"/>
+
+                                </Grid>
+                            </GroupBox>
+                        </Label>
+
+                        <Label Margin="0,184,264,-231" Height="134" VerticalAlignment="Top" >
+                            <GroupBox x:Name="groupBox3" Header="Użytkownicy" Height="112" Width="217">
+                                <Grid Margin="0,0,-2,0">
+                                    <ListBox x:Name="userListBox" HorizontalAlignment="Left" Height="80" Margin="3,4,0,0" VerticalAlignment="Top" Width="100">
+
+                                    </ListBox>
+                                    <Button x:Name="chooseUserButton" Content="Wybierz &gt;&gt;" HorizontalAlignment="Left" Margin="117,6,0,0" VerticalAlignment="Top" Width="74" Click="chooseUserButton_Click"/>
+                                    <Button x:Name="addUserButton" Content="Dodaj" HorizontalAlignment="Left" Margin="117,31,0,0" VerticalAlignment="Top" Width="74" Click="addUserButton_Click"/>
+                                    <Button x:Name="deleteUserButton" Content="Usuń" HorizontalAlignment="Left" Margin="117,56,0,0" VerticalAlignment="Top" Width="74" Click="deleteUserButton_Click"/>
+                                    <Button x:Name="deleteUserButton_Copy" Content="Usuń" HorizontalAlignment="Left" Margin="117,56,0,0" VerticalAlignment="Top" Width="74" Click="deleteUserButton_Click"/>
+
+                                </Grid>
+                            </GroupBox>
+
+                        </Label>
+                        <Button x:Name="encryptButton" Content="Szyfruj" HorizontalAlignment="Left" Margin="21,323,0,-256" VerticalAlignment="Top" Width="90" Click="encryptButton_Click" RenderTransformOrigin="-0.406,2.3" />
+                        <ProgressBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="250" Margin="232,326,0,-259" RenderTransformOrigin="0.394,4.125"/>
+
+                        <Label x:Name="label4" Content="Stan szyfrowania" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="237,300,0,-239"/>
+                        <Button x:Name="decryptButton" Content="Deszyfruj" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="131,323,0,-256" Click="decryptButton_Click"/>
+                        <Label Margin="232,184,0,-231" Height="134" VerticalAlignment="Top" >
+                            <GroupBox x:Name="choosenUsersGroupBox" Header="Wybrani użytkownicy" Height="112" Width="259">
+                                <Grid Margin="0,0,-39,0">
+                                    <ListBox x:Name="choosenUserListBox" HorizontalAlignment="Left" Height="80" Margin="3,4,0,0" VerticalAlignment="Top" Width="129"/>
+                                    <Button Margin="137,0,42,34" Height="20" x:Name="deleteUserFromChoosenButton" VerticalAlignment="Bottom" Content="Usuń z wybranych" Click="deleteUserFromChoosenButton_Click"></Button>
+                                </Grid>
+                            </GroupBox>
+
+                        </Label>
+
+
+                    </Grid>
+
+
+                </Label>
+            </TabItem>
+            <TabItem>
+                <TabItem.Header>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Odszyfrowanie" Foreground="Red" />
+                    </StackPanel>
+                </TabItem.Header>
+                <Label Margin="0,7,0,228" >
+                    <Grid>
+                        <GroupBox  x:Name="groupBox4" Header="Plik" Height="83" Width="501" Grid.ColumnSpan="2">
+                            <Grid>
+                                <Button x:Name="fileToDecryptChooser" Content="Wybierz" HorizontalAlignment="Left" Margin="419,6,0,0" VerticalAlignment="Top" Width="60" Click="fileToDecryptChooser_Click" />
+                                <Border BorderThickness="1" BorderBrush="LightGray" Margin="132,0,75,31">
+                                    <TextBlock Background="White" x:Name ="FileToDecrypt" HorizontalAlignment="Right" Height="15" Margin="0,4,9,9" TextWrapping="Wrap" VerticalAlignment="Center" Width="263"><Run Text="Wybierz plik do "/><Run Text="od"/><Run Text="szyfrowania..."/></TextBlock>
+
+                                </Border>
+                                <Border BorderThickness="1" BorderBrush="LightGray" Margin="132,31,75,0">
+                                    <TextBlock Background="White" x:Name ="FileToSaveDecrypt" Text="Wybierz plik wynikowy..." HorizontalAlignment="Left" Height="15" Margin="9,4,0,9" TextWrapping="Wrap" VerticalAlignment="Center" Width="262"/>
+
+                                </Border>
+                                <Button x:Name="fileToSaveDecryptChooser" Content="Wybierz" HorizontalAlignment="Left" Margin="419,37,0,4" Width="60" Click="fileToSaveDecryptChooser_Click"/>
+                                <Label x:Name="labe4l" Content="Plik wejściowy:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115"/>
+                                <Label x:Name="lab4el_Copy" Content="Plik wyjściowy:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115" Margin="0,31,0,0"/>
+
+
+                            </Grid>
+                        </GroupBox>
+                        <GroupBox  x:Name="groupBox45" Header="Użytkownik" Margin="0,109,0,-103">
+                            <Grid Margin="0,0,-12,-2">
+                                <Label x:Name="ChooseUserLabel" Content="Wybierz użytkownika:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="131"/>
+                                <Label x:Name="EnterPasswordLabel" Content="Wpisz hasło:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115" Margin="156,0,0,0"/>
+                                <ComboBox x:Name="allowedUsersToDecryptComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="allowedUsersToDecryptComboBox_SelectionChanged">
+                             </ComboBox>
+                                <PasswordBox x:Name="passwordToDecryptBox" ToolTip="Twoje hasło" VerticalAlignment="Center" Margin="161,33,178,8" Height="20"/>
+
+
+                            </Grid>
+
+                        </GroupBox>
+                        <Grid Margin="0,205,0,-205">
+                            <Button x:Name="DecryptButton" Content="Odszyfruj" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" Width="90" Click="DecryptButton_Click_1"  />
+                            <ProgressBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="250" Margin="10,31,0,0"/>
+                            <Label x:Name="ProgressOfDecryptLabel" Content="Stan odszyfrowania" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0" Width="117"/>
+                            <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="117,62,0,0"/>
+
+                        </Grid>
+
+
+
+                    </Grid>
+                </Label>
+
+            </TabItem>
+
+
+        </TabControl>
+
+    </Grid>
+</Window>

@@ -1,0 +1,17 @@
+﻿<Window x:Class="BSK_Project.CreateUserWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BSK_Project"
+        mc:Ignorable="d"
+        Title="CreateUserWindow" Height="174" Width="300">
+    <Grid Margin="0,0,0,0">
+        <Label x:Name="giveEmailLabel" Content="Podaj e-mail:" HorizontalAlignment="Left" Margin="39,39,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="givePasswordLabel" Content="Podaj hasło:" HorizontalAlignment="Left" Margin="39,70,0,0" VerticalAlignment="Top"/>
+        <TextBox x:Name="emailBox" HorizontalAlignment="Left" Height="23" TextWrapping="Wrap"  VerticalAlignment="Top" Width="120" Margin="123,42,0,0"/>
+        <PasswordBox x:Name="passwordBox"  HorizontalAlignment="Left" VerticalAlignment="Top" Margin="123,70,0,0" Width="120" Height="26"/>
+        <Button x:Name="createUserButton" Content="Utwórz" HorizontalAlignment="Left" VerticalAlignment="Top" Width="75" Margin="168,101,0,0" Click="createUserButton_Click" />
+
+    </Grid>
+</Window>
