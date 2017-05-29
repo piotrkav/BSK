@@ -38,6 +38,9 @@ namespace BSK_Project
             int len = cipher.ProcessBytes(input, 0, input.Length, output, 0);
             cipher.DoFinal(output, len);
             return output;
+
+
+
             //if (forEncrypt)
             //{
             //    byte[] _in = input;

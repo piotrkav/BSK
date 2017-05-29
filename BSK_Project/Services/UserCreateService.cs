@@ -49,13 +49,17 @@ namespace BSK_Project
             var privatePath = Constants.PrivateKeysFolderPath + _email;
             //save keys to files
 
-
-            // Console.WriteLine("public key" + serializedPublic);
             File.WriteAllBytes(publicPath, serializedPublicBytes);
 
-            var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
-            File.WriteAllBytes(privatePath, privateKey);
-            privateKey = null;
+            File.WriteAllBytes(privatePath, serializedPrivateBytes);
+
+
+            
+            //var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0
+            // Console.WriteLine(" privateKey 1");
+            // Console.WriteLine(Convert.ToBase64String(privateKey));
+            // var key22 =  PrivateKeyFactory.CreateKey(privateKey);
+            //privateKey = null;
             // Console.WriteLine("private key" + serializedPrivate);
             // privateKey = null;
             //TwoFishUtils.ConvertKeyToString(publicKey));
@@ -66,10 +70,11 @@ namespace BSK_Project
 
             //var puk = File.ReadAllBytes(publicPath);
             //AsymmetricKeyParameter deserializedKey1 = PublicKeyFactory.CreateKey(puk);
-            //var puk2 = File.ReadAllBytes(privatePath);
+            //         var puk2 = File.ReadAllBytes(privatePath);
+            //       FileEncryptionService service = new FileEncryptionService();
+            //  var x =  service.GetPrivateKey2(_email);
 
-
-            //AsymmetricKeyParameter deserializedKey2 = PrivateKeyFactory.CreateKey(puk2);
+            //     AsymmetricKeyParameter deserializedKey2 = PrivateKeyFactory.CreateKey(puk2);
             //if (keys.Public.Equals(deserializedKey1))
             //{
             //    Console.WriteLine("TRUE");

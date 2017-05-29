@@ -60,7 +60,6 @@ namespace BSK_Project
             byte[] privateKey = File.ReadAllBytes(Constants.PrivateKeysFolderPath + email);
             var deserializedKey = PrivateKeyFactory.CreateKey(privateKey);
             return deserializedKey;
-
         }
 
         public byte[] GetEncryptedByRsaSessionKey(AsymmetricKeyParameter keyParameter, byte[] sessionKey)

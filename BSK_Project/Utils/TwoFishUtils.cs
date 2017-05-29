@@ -21,17 +21,7 @@ namespace BSK_Project
             return bcEngine.Encrypt(mode, plain, key, iv, subLength);
         }
 
-        public static byte[] TwoFishPrivateKeyEncryption(CipherModes mode, string plain, byte[] key, byte[] iv, int subLength)
-        {
-            BCEngine bcEngine = new BCEngine(Encoding.ASCII);
-
-            return bcEngine.Encrypt(mode, plain, key, iv, subLength);
-        }
-        public static byte[] TwoFishPrivateKeyEncryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
-        {
-            BCEngine bcEngine = new BCEngine(Encoding.ASCII);
-            return bcEngine.Encrypt(mode, plain, key, iv, subLength);
-        }
+       
        
 
 
@@ -59,6 +49,11 @@ namespace BSK_Project
             return bcEngine.Decrypt(mode, plain, key, iv, subLength);
         }
 
+        public static byte[] TwoFishPrivateKeyEncryption(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength)
+        {
+            BCEngine bcEngine = new BCEngine(Encoding.ASCII);
+            return bcEngine.Encrypt(mode, plain, key, iv, subLength);
+        }
 
 
         internal static bool SaveData(string fileName, byte[] data)
