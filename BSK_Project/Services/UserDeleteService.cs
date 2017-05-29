@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace BSK_Project
@@ -22,12 +23,13 @@ namespace BSK_Project
 
         public void DeleteFullUserInfo()
         {
+            
             DeleteFromList();
             DeleteUserKeys();
         }
         public void DeleteFromList()
         {
-            UserListBox.Items.Remove(User);
+               UserListBox.Items.Remove(User);
         }
         private void DeleteUserKeys()
         {

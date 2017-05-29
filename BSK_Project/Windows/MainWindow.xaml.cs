@@ -202,6 +202,11 @@ namespace BSK_Project
                 UserDeleteService userDeleteService = new UserDeleteService(userListBox, userToDelete);
                 userDeleteService.DeleteFullUserInfo();
             }
+            else
+            {
+                MessageBox.Show("Nie wybrano użytkownika", "Błąd usuwania", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+
+            }
         }
 
         private void deleteUserFromChoosenButton_Click(object sender, RoutedEventArgs e)
