@@ -17,11 +17,13 @@ using static BSK_Project.CipherMode;
 namespace BSK_Project
 {
 
-    internal class UserCreateService
+    public class UserCreateService
     {
         private readonly string _email;
         private byte[] _password;
 
+        public string GetEmail() => _email;
+        public byte[] GetPassword() => _password;
 
         public UserCreateService(string email, byte[] password)
         {

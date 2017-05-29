@@ -3,7 +3,7 @@ using System.Text;
 
 namespace BSK_Project
 {
-    class HashUtil
+   public class HashUtil
     {
 
         public static byte[] GenerateSha256Hash(string inputString)

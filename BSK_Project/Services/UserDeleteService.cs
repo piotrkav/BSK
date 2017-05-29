@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 namespace BSK_Project
 {
-    class UserDeleteService
+    public class UserDeleteService
     {
         private object User { get; set; }
         private ListBox UserListBox { get; set; }
@@ -35,6 +35,12 @@ namespace BSK_Project
         {
             File.Delete(Constants.PrivateKeysFolderPath + User);
             File.Delete(Constants.PublicKeysFolderPath + User);
+        }
+
+        public void DeleteUserKeysForTest(string p1, string p2)
+        {
+            File.Delete(p1);
+            File.Delete(p2);
         }
     }
 }
