@@ -144,20 +144,20 @@ namespace BSK_Project.Utils
 
      
 
-        private static byte[] StringToByteArray(string hex)
-        {
-            if (hex.Length % 2 == 1)
-                throw new Exception("The binary key cannot have an odd number of digits");
+        //private static byte[] StringToByteArray(string hex)
+        //{
+        //    if (hex.Length % 2 == 1)
+        //        throw new Exception("The binary key cannot have an odd number of digits");
 
-            byte[] arr = new byte[hex.Length >> 1];
+        //    byte[] arr = new byte[hex.Length >> 1];
 
-            for (int i = 0; i < hex.Length >> 1; ++i)
-            {
-                arr[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + (GetHexVal(hex[(i << 1) + 1])));
-            }
+        //    for (int i = 0; i < hex.Length >> 1; ++i)
+        //    {
+        //        arr[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + (GetHexVal(hex[(i << 1) + 1])));
+        //    }
 
-            return arr;
-        }
+        //    return arr;
+        //}
 
         private static int GetHexVal(char hex)
         {

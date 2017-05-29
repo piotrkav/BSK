@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
+using System.Linq;
 using static BSK_Project.CipherMode;
 
 namespace BSK_Project
@@ -224,16 +225,18 @@ namespace BSK_Project
         {
             FileEncryptionService service = new FileEncryptionService();
 
-            //var passwordHashed = HashUtil.GenerateSha256Hash(passwordToDecryptBox.Password);
+            var passwordHashed = HashUtil.GenerateSha256Hash(passwordToDecryptBox.Password);
             //Console.WriteLine(Convert.ToBase64String(passwordHashed));
             var user = allowedUsersToDecryptComboBox.SelectedItem.ToString();
 
             byte[] privateKey = File.ReadAllBytes(Constants.PrivateKeysFolderPath + user);
-            //var privateKeyDecrypted = TwoFishUtils.TwoFishFileDecryption(CipherModes.Ecb, privateKey, passwordHashed, null, 0);
+            var privateKeyDecrypted = TwoFishUtils.TwoFishFileDecryption(CipherModes.Ecb, privateKey, passwordHashed, null, 0);
+          
+
             //Console.WriteLine(" privateKey 2");
             //Console.WriteLine(Convert.ToBase64String(privateKeyDecrypted));
 
-             var keyParameter = PrivateKeyFactory.CreateKey(privateKey);
+            var keyParameter = PrivateKeyFactory.CreateKey(privateKeyDecrypted);
             // var deserializedKey = PrivateKeyFactory.CreateKey(privateKey);
             // var privateKey = service.GetPrivateKey2(user);
             ///  PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyDecrypted);
@@ -260,6 +263,25 @@ namespace BSK_Project
 
             //Console.WriteLine(_userPrivateKey);
 
+        }
+
+        private void testButton_Click(object sender, RoutedEventArgs e)
+        {
+            var privatePath = Constants.PrivateKeysFolderPath + "test";
+       
+            byte[] password = HashUtil.GenerateSha256Hash("test");
+            byte[] key = File.ReadAllBytes(privatePath);
+
+            //File.WriteAllBytes(privatePath, serializedPrivateBytes);
+
+            var pk = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, key, password, null, 0);
+            var enc = TwoFishUtils.TwoFishPrivateKeyDecryption(CipherModes.Ecb, pk, password, null, 0);
+            bool areEqual = key.SequenceEqual(enc);
+
+            if (areEqual)
+            {
+                Console.WriteLine("true");
+            }
         }
     }
 }

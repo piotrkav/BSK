@@ -51,10 +51,11 @@ namespace BSK_Project
 
             File.WriteAllBytes(publicPath, serializedPublicBytes);
 
-            File.WriteAllBytes(privatePath, serializedPrivateBytes);
+            //File.WriteAllBytes(privatePath, serializedPrivateBytes);
 
+            var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
+            File.WriteAllBytes(privatePath, privateKey);
 
-            
             //var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0
             // Console.WriteLine(" privateKey 1");
             // Console.WriteLine(Convert.ToBase64String(privateKey));
