@@ -21,6 +21,8 @@ namespace BSK_Project
         public const string Algorithm = "Algorithm";
         public const string KeySize = "KeySize";
         public const string BlockSize = "BlockSize";
+        public const string SubBlockSize = "SubBlockSize";
+        public const string Key = "Key";
         public const string CipherMode = "CipherMode";
         public const string IV = "IV";
         public const string ApprovedUsers = "ApprovedUsers";
@@ -30,7 +32,13 @@ namespace BSK_Project
         public const string EncryptedFileHeader = "EncryptedFileHeader";
         public static int[] KeyLengths = {128, 192, 256};
         public static int[] SubBlockSizes = {8, 16, 32, 64};
-        public static string TwoFish = "Twofish";
-        public static string Content = "Content";
+        public const string TwoFish = "Twofish";
+        public const string Content = "Content";
+        public const string Rsa = "RSA";
+        public const string PublicType = "Public";
+        public const string PrivateType = "Private";
+        public const string KeyType = "KeyType";
+        public const string KeyValue = "KeyValue";
+        public const int BlockSizeValue = 128;
     }
 }

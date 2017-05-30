@@ -66,6 +66,7 @@
     <Compile Include="Utils\AdditionalUtils.cs" />
     <Compile Include="Resources\Constants.cs" />
     <Compile Include="Utils\CipherUtils.cs" />
+    <Compile Include="Resources\KeyDetails.cs" />
     <Compile Include="Windows\CreateUserWindow.xaml.cs">
       <DependentUpon>CreateUserWindow.xaml</DependentUpon>
     </Compile>
@@ -80,6 +81,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Windows\ImportUserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Windows\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -89,6 +94,9 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="BCEngine.cs" />
+    <Compile Include="Windows\ImportUserWindow.xaml.cs">
+      <DependentUpon>ImportUserWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Windows\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

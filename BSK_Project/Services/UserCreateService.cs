@@ -7,6 +7,8 @@ using Org.BouncyCastle.Security;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using System.Windows;
+using BSK_Project.Utils;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
@@ -35,7 +37,7 @@ namespace BSK_Project
         {
             //keys
             var keys = GetKeyPair(Constants.RsaKeySize);
-            
+
             //private
             PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(keys.Private);
             byte[] serializedPrivateBytes = privateKeyInfo.ToAsn1Object().GetDerEncoded();
@@ -45,18 +47,23 @@ namespace BSK_Project
             byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
             string serializedPublic = Convert.ToBase64String(serializedPublicBytes);
 
-            
+
             //paths
             var publicPath = Constants.PublicKeysFolderPath + _email;
             var privatePath = Constants.PrivateKeysFolderPath + _email;
+
+            if (File.Exists(publicPath))
+            {
+                MessageBox.Show("Użytkownik o takiej nazwie już istnieje", "Tworzenie użytkownika", MessageBoxButton.OK, MessageBoxImage.Exclamation); return;
+            }
             //save keys to files
 
-            File.WriteAllBytes(publicPath, serializedPublicBytes);
-
-            //File.WriteAllBytes(privatePath, serializedPrivateBytes);
+            KeyDetails publicKeyDetails = new KeyDetails(Constants.Rsa, Constants.PublicType, _email, serializedPublicBytes);
+            XmlUtils.CreateXmlKey(publicPath, publicKeyDetails);
 
             var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
-            File.WriteAllBytes(privatePath, privateKey);
+            KeyDetails privateKeyDetails = new KeyDetails(Constants.Rsa, Constants.PrivateType, _email, privateKey);
+            XmlUtils.CreateXmlKey(privatePath, privateKeyDetails);
 
             //var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0
             // Console.WriteLine(" privateKey 1");

@@ -34,34 +34,39 @@ namespace BSK_Project
         {
             byte[] result;
             var cipher = CipherUtils.CreateTwofishCipher(forEncrypt, mode, key, iv, subLength);
-            //byte[] output = new byte[cipher.GetOutputSize(input.Length)];
-            //int len = cipher.ProcessBytes(input, 0, input.Length, output, 0);
-            //cipher.DoFinal(output, len);
-            //return output;
-
-
-
-            if (forEncrypt)
+            try
             {
-                byte[] _in = input;
-                byte[] _out = new byte[cipher.GetOutputSize(_in.Length)];
-                int len1 = cipher.ProcessBytes(_in, 0, _in.Length, _out, 0);
-                cipher.DoFinal(_out, len1);
-                result = _out;
+
+
+                if (forEncrypt)
+                {
+                    byte[] _in = input;
+                    byte[] _out = new byte[cipher.GetOutputSize(_in.Length)];
+                    int len1 = cipher.ProcessBytes(_in, 0, _in.Length, _out, 0);
+                    cipher.DoFinal(_out, len1);
+                    result = _out;
+                }
+                else
+                {
+                    byte[] _in = input;
+                    byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
+                    int len = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
+                    len += cipher.DoFinal(temp, len);
+
+                    result = TransferBytes(len, temp);
+                    //cipher.ProcessBytes(input);
+                    //return cipher.DoFinal(input);
+
+                }
+                return result;
             }
-            else
+            catch (Exception e)
             {
-                byte[] _in = input;
-                byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
-                int len = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
-                len += cipher.DoFinal(temp, len);
-
-                result = TransferBytes(len, temp);
-                //cipher.ProcessBytes(input);
-                //return cipher.DoFinal(input);
-
+                FileEncryptionService service = new FileEncryptionService();
+                var sk = service.GenerateKey(key.Length*Constants.ByteSize);
+                
+                return BouncyCastleCrypto(false, mode, input, sk, iv, subLength);
             }
-            return result;
 
 
         }

@@ -9,6 +9,8 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using BSK_Project.Utils;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Pkcs;
@@ -28,32 +30,21 @@ namespace BSK_Project
             return key;
         }
 
-        public AsymmetricKeyParameter GetPublicKey(string email)
-        {
-            var fileStream = File.OpenText(Constants.PublicKeysFolderPath + email);
-            var pemReader = new PemReader(fileStream);
-            var keyParameter = (AsymmetricKeyParameter)pemReader.ReadObject();
-            return keyParameter;
-        }
-
         public AsymmetricKeyParameter GetPublicKey2(string email)
         {
 
-            byte[] publicKey = File.ReadAllBytes(Constants.PublicKeysFolderPath + email);
-
+            byte[] publicKey = XmlUtils.GetKey(Constants.PublicKeysFolderPath + email);//File.ReadAllBytes(Constants.PublicKeysFolderPath + email);
+            if (publicKey == null)
+            {
+                MessageBox.Show("Klucz ma złą strukturę. Możliwa przyczyna - zaimportowanie błędnego klucza", "Błąd klucza", MessageBoxButton.OK, MessageBoxImage.Error);
+                return null;
+            }
             var deserializedKey = PublicKeyFactory.CreateKey(publicKey);
 
             return deserializedKey;
 
         }
 
-        public AsymmetricKeyParameter GetPrivateKey(string email)
-        {
-            var fileStream = File.OpenText(Constants.PrivateKeysFolderPath + email);
-            var pemReader = new PemReader(fileStream);
-            var keyParameter = (AsymmetricCipherKeyPair)pemReader.ReadObject();
-            return keyParameter.Private;
-        }
 
         public AsymmetricKeyParameter GetPrivateKey2(string email)
         {
