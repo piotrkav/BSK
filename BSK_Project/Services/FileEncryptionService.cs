@@ -18,7 +18,7 @@ using Org.BouncyCastle.Security;
 
 namespace BSK_Project
 {
-    internal class FileEncryptionService
+    public class FileEncryptionService
     {
 
         public byte[] GenerateKey(int size)
@@ -48,7 +48,7 @@ namespace BSK_Project
 
         public AsymmetricKeyParameter GetPrivateKey2(string email)
         {
-            byte[] privateKey = File.ReadAllBytes(Constants.PrivateKeysFolderPath + email);
+            byte[] privateKey = XmlUtils.GetKey(Constants.PrivateKeysFolderPath + email);
             var deserializedKey = PrivateKeyFactory.CreateKey(privateKey);
             return deserializedKey;
         }

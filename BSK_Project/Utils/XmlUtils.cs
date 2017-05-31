@@ -6,10 +6,11 @@ using System.Windows;
 using System.Xml;
 using Org.BouncyCastle.Crypto.Paddings;
 using static BSK_Project.CipherMode;
+using System.Text;
 
 namespace BSK_Project.Utils
 {
-    internal class XmlUtils
+    public class XmlUtils
     {
 
         public static void CreateXmlKey(string fileName, KeyDetails details)
@@ -104,9 +105,10 @@ namespace BSK_Project.Utils
 
                 using (var reader = XmlReader.Create(fileName))
                 {
+                    int sizeInBytes = Encoding.ASCII.GetBytes(reader.ReadOuterXml()).Length;
                     while (reader.Read())
                     {
-
+           
                         if (reader.NodeType == XmlNodeType.Element)
                         {
                             switch (reader.Name)
@@ -151,11 +153,7 @@ namespace BSK_Project.Utils
                                     Console.WriteLine("Session Key " + reader.Value);
                                     var sessionKey = reader.Value;
                                     allowedUserDictionary.Add(email, Convert.FromBase64String(sessionKey));
-                                    //if (reader.Name.Equals(Constants.SessionKey))
-                                    //{
-                                    //    reader.Read();
-                                    //    
-                                    //}
+         
                                     break;
 
 
@@ -228,7 +226,20 @@ namespace BSK_Project.Utils
             }
         }
 
-
+        public static int getNumberOfBytesToSkip(byte[] inputFile)
+        {
+            byte STX = 0x02;
+            int counter = 0;
+            for (int i = 0; i < inputFile.Length; i++)
+            {
+                counter++;
+                if(inputFile[i] == STX)
+                {
+                    break;
+                }
+            }
+            return counter;
+        }
 
         //private static byte[] StringToByteArray(string hex)
         //{

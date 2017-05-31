@@ -9,7 +9,7 @@ using static BSK_Project.CipherMode;
 
 namespace BSK_Project
 {
-    internal class TwoFishUtils
+    public class TwoFishUtils
     {
 
 
