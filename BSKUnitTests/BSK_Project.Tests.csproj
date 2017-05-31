@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto">
+      <HintPath>..\BSK_Project\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
@@ -57,7 +60,11 @@
   <ItemGroup>
     <Compile Include="CreateUserTest.cs" />
     <Compile Include="DeleteUserTest.cs" />
+    <Compile Include="EncryptingAndDecryptingFileTest.cs" />
+    <Compile Include="EncryptingDecryptingPrivateKeyTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ImportUserTest.cs" />
+    <Compile Include="RSAEncryptAndDeryptSessionKeyTestcs.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\BSK_Project\BSK_Project.csproj">
