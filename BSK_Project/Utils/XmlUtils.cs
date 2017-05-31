@@ -221,7 +221,20 @@ namespace BSK_Project.Utils
             }
         }
 
-
+        public static int getNumberOfBytesToSkip(byte[] inputFile)
+        {
+            byte STX = 0x02;
+            int counter = 0;
+            for (int i = 0; i < inputFile.Length; i++)
+            {
+                counter++;
+                if(inputFile[i] == STX)
+                {
+                    break;
+                }
+            }
+            return counter;
+        }
 
         //private static byte[] StringToByteArray(string hex)
         //{
