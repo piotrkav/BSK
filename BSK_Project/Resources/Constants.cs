@@ -40,5 +40,7 @@ namespace BSK_Project
         public const string KeyType = "KeyType";
         public const string KeyValue = "KeyValue";
         public const int BlockSizeValue = 128;
+        public const string Modulus = "Modulus";
+        public const string Exponent = "Exponent";
     }
 }

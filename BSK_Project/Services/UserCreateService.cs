@@ -12,6 +12,7 @@ using BSK_Project.Utils;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.Pkcs;
 using Org.BouncyCastle.Asn1.X509;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.X509;
 using static BSK_Project.CipherMode;
@@ -47,6 +48,10 @@ namespace BSK_Project
             byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
             string serializedPublic = Convert.ToBase64String(serializedPublicBytes);
 
+            RsaKeyParameters publicKey = (RsaKeyParameters)keys.Public;
+            var modulus = publicKey.Modulus.ToByteArray();
+            var exponent = publicKey.Exponent.ToByteArray();
+
 
             //paths
             var publicPath = Constants.PublicKeysFolderPath + _email;
@@ -58,11 +63,11 @@ namespace BSK_Project
             }
             //save keys to files
 
-            KeyDetails publicKeyDetails = new KeyDetails(Constants.Rsa, Constants.PublicType, _email, serializedPublicBytes);
+            KeyDetails publicKeyDetails = new KeyDetails(Constants.Rsa, Constants.PublicType, _email, serializedPublicBytes, modulus,exponent);
             XmlUtils.CreateXmlKey(publicPath, publicKeyDetails);
 
             var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
-            KeyDetails privateKeyDetails = new KeyDetails(Constants.Rsa, Constants.PrivateType, _email, privateKey);
+            KeyDetails privateKeyDetails = new KeyDetails(Constants.Rsa, Constants.PrivateType, _email, privateKey,null,null);
             XmlUtils.CreateXmlKey(privatePath, privateKeyDetails);
 
             //var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0

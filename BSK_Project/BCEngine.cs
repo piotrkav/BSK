@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using Org.BouncyCastle;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Paddings;
@@ -69,6 +70,13 @@ namespace BSK_Project
             }
 
 
+        }
+
+        private byte[] BouncyCatleCryptoWithProgress(bool forEncrypt, CipherModes mode, byte[] input, byte[] key,
+            byte[] iv, int subLength, ProgressBar progressBar)
+        {
+            return null;
+            
         }
 
         public byte[] TransferBytes(int size, byte[] bytesIn)

@@ -281,10 +281,18 @@ namespace BSK_Project
                 }
                 catch (Exception ex)
                 {
-                    var badSessionKey = service.GenerateKey(_fileToDecryptAlgorithmDetails.KeySize);
+                    int size = _fileToDecryptAlgorithmDetails.KeySize/Constants.ByteSize;
+                    byte[] badSessionKey = new byte[size];
+                    for (int i = 0; i < size; i++)
+                    {
+                         badSessionKey[i] = passwordHashed[i];
+                    }
+                    Console.WriteLine("hash: " + Encoding.ASCII.GetString(badSessionKey));
                     var fileDone = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
                         _fileToBeDecrypted, badSessionKey, _fileToDecryptAlgorithmDetails.Iv,
                         _fileToDecryptAlgorithmDetails.SubBlockSize);
+
+                    Console.WriteLine("plik out " + Encoding.ASCII.GetString(fileDone));
 
                     File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);
                 }

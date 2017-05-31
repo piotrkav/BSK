@@ -29,6 +29,11 @@ namespace BSK_Project.Utils
                 writer.WriteElementString(Constants.User, details.User);
                 writer.WriteElementString(Constants.Algorithm, details.Algorithm);
                 writer.WriteElementString(Constants.KeyType, details.Type);
+                if (details.Modulus != null)
+                {
+                    writer.WriteElementString(Constants.Modulus, Convert.ToBase64String(details.Modulus));
+                    writer.WriteElementString(Constants.Exponent, Convert.ToBase64String(details.Exponent));
+                }
                 writer.WriteElementString(Constants.KeyValue,
                     BitConverter.ToString(details.Content).Replace("-", string.Empty));
                 writer.WriteEndElement();
