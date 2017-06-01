@@ -11,6 +11,7 @@ using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using System.Linq;
 using System.Security.Policy;
+using System.Windows.Input;
 using BSK_Project.Windows;
 using Org.BouncyCastle.Crypto;
 using static BSK_Project.CipherMode;
@@ -122,7 +123,7 @@ namespace BSK_Project
             if (AdditionalUtils.CheckIfCanEncrypt(_fileToEncryptPath, _fileToSaveEncryptedPath,
                 choosenUserListBox.Items.Count))
             {
-
+                Mouse.OverrideCursor = Cursors.Wait;
                 _encryptedFile = TwoFishUtils.TwoFishPrivateKeyEncryption(mode, _fileToBeEncrypted, sessionKey, iv, subLength);
 
                 var usersEncryptedSessionKeys = new SortedDictionary<string, byte[]>();
@@ -146,7 +147,7 @@ namespace BSK_Project
                 sessionKey = null;
 
             }
-
+            Mouse.OverrideCursor = Cursors.Arrow;
             MessageBox.Show("Zaszyfrowano plik.");
         }
 
@@ -248,6 +249,7 @@ namespace BSK_Project
             if (AdditionalUtils.checkIfCanDecrypt(_fileToDecryptPath, _fileToSaveDecryptedPath,
                 passwordToDecryptBox.Password))
             {
+                Mouse.OverrideCursor = Cursors.Wait;
                 FileEncryptionService service = new FileEncryptionService();
                 var passwordHashed = HashUtil.GenerateSha256Hash(passwordToDecryptBox.Password);
                 var user = allowedUsersToDecryptComboBox.SelectedItem.ToString();
@@ -277,6 +279,7 @@ namespace BSK_Project
                     if (fileDone != null)
                         File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);
                 }
+                Mouse.OverrideCursor = Cursors.Arrow;
                 MessageBox.Show("Odszyfrowano plik.");
 
             }
