@@ -101,8 +101,11 @@ namespace BSK_Project
         }
 
 
+
         private void encryptButton_Click(object sender, RoutedEventArgs e)
         {
+
+
             var fileEncryptionService = new FileEncryptionService();
 
             var size = keyLengthComboBox.SelectedItem != null ? int.Parse(keyLengthComboBox.SelectedItem.ToString()) : 128;
@@ -114,11 +117,13 @@ namespace BSK_Project
 
 
 
+
             var sessionKey = fileEncryptionService.GenerateKey(size);
             if (AdditionalUtils.CheckIfCanEncrypt(_fileToEncryptPath, _fileToSaveEncryptedPath,
                 choosenUserListBox.Items.Count))
             {
-                _encryptedFile = TwoFishUtils.TwoFishEncryption(mode, _fileToBeEncrypted, sessionKey, iv, subLength);
+
+                _encryptedFile = TwoFishUtils.TwoFishPrivateKeyEncryption(mode, _fileToBeEncrypted, sessionKey, iv, subLength);
 
                 var usersEncryptedSessionKeys = new SortedDictionary<string, byte[]>();
                 foreach (var user in choosenUserListBox.Items)
@@ -139,12 +144,10 @@ namespace BSK_Project
 
                 XmlUtils.CreateXml(_fileToSaveEncryptedPath, algorithmDetails, _encryptedFile);
                 sessionKey = null;
+
             }
 
-            //TwoFishUtils.SaveData(_fileToSaveEncryptedPath, _encryptedFile);
-
-
-
+            MessageBox.Show("Zaszyfrowano plik.");
         }
 
 
@@ -156,10 +159,11 @@ namespace BSK_Project
             if (result != true) return;
 
             _fileToDecryptPath = dlg.FileName;
+            int x = XmlUtils.GetNumberOfBytesToSkip(_fileToDecryptPath);
             _fileToDecryptAlgorithmDetails = XmlUtils.GetAlgorithmDetails(_fileToDecryptPath);
             if (_fileToDecryptAlgorithmDetails != null)
             {
-                
+
                 FileToDecrypt.Text = _fileToDecryptPath;
                 foreach (var user in _fileToDecryptAlgorithmDetails.UserSessionKeysDictionary)
                 {
@@ -167,7 +171,7 @@ namespace BSK_Project
                     {
                         allowedUsersToDecryptComboBox.Items.Add(user.Key);
                     }
-                    
+
                 }
                 if (allowedUsersToDecryptComboBox.Items.Count == 0)
                 {
@@ -178,7 +182,7 @@ namespace BSK_Project
 
 
 
-                _fileToBeDecrypted = XmlUtils.GetEncryptedContent(_fileToDecryptPath);
+                _fileToBeDecrypted = XmlUtils.GetContent(_fileToDecryptPath);
 
             }
         }
@@ -193,15 +197,6 @@ namespace BSK_Project
             FileToSaveDecrypt.Text = _fileToSaveDecryptedPath;
             //decryptedFile = System.IO.File.ReadAllBytes(_fileToSaveDecryptedPath);
         }
-
-        private void DecryptButton_Click_2(object sender, RoutedEventArgs e)
-        {
-            //  decryptedFile = TwoFishUtils.TwoFishFileDecryption(fileToBeDecrypted, key, true);
-            //  TwoFishUtils.SaveData(FileToSaveDecryptedPath, decryptedFile);
-
-        }
-
-
 
         private void addUserButton_Click(object sender, RoutedEventArgs e)
         {
@@ -253,23 +248,16 @@ namespace BSK_Project
             if (AdditionalUtils.checkIfCanDecrypt(_fileToDecryptPath, _fileToSaveDecryptedPath,
                 passwordToDecryptBox.Password))
             {
-
                 FileEncryptionService service = new FileEncryptionService();
-
                 var passwordHashed = HashUtil.GenerateSha256Hash(passwordToDecryptBox.Password);
-                //Console.WriteLine(Convert.ToBase64String(passwordHashed));
                 var user = allowedUsersToDecryptComboBox.SelectedItem.ToString();
 
                 byte[] privateKey = XmlUtils.GetKey(Constants.PrivateKeysFolderPath + user);
                 var privateKeyDecrypted = TwoFishUtils.TwoFishFileDecryption(CipherModes.Ecb, privateKey, passwordHashed, null, 0);
 
-
-                //Console.WriteLine(" privateKey 2");
-                //Console.WriteLine(Convert.ToBase64String(privateKeyDecrypted));
-                AsymmetricKeyParameter keyParameter = null;
                 try
                 {
-                    keyParameter = PrivateKeyFactory.CreateKey(privateKeyDecrypted);
+                    var keyParameter = PrivateKeyFactory.CreateKey(privateKeyDecrypted);
                     var sessionKey = _fileToDecryptAlgorithmDetails.UserSessionKeysDictionary[user];
                     var decryptedSessionKey = service.GetDecryptedByRsaSessionKey(keyParameter, sessionKey);
                     var fileDone = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
@@ -281,77 +269,23 @@ namespace BSK_Project
                 }
                 catch (Exception ex)
                 {
-                    int size = _fileToDecryptAlgorithmDetails.KeySize/Constants.ByteSize;
-                    byte[] badSessionKey = new byte[size];
-                    for (int i = 0; i < size; i++)
-                    {
-                         badSessionKey[i] = passwordHashed[i];
-                    }
-                    Console.WriteLine("hash: " + Encoding.ASCII.GetString(badSessionKey));
+
+
                     var fileDone = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
-                        _fileToBeDecrypted, badSessionKey, _fileToDecryptAlgorithmDetails.Iv,
-                        _fileToDecryptAlgorithmDetails.SubBlockSize);
-
-                    Console.WriteLine("plik out " + Encoding.ASCII.GetString(fileDone));
-
-                    File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);
+                        _fileToBeDecrypted, passwordHashed, _fileToDecryptAlgorithmDetails.Iv,
+                        _fileToDecryptAlgorithmDetails.SubBlockSize, true);
+                    if (fileDone != null)
+                        File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);
                 }
-                
-                //else
-                //{
-                //   var badSessionKey = service.GenerateKey(_fileToDecryptAlgorithmDetails.KeySize);
-                //    var fileDoneBad = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
-                //        _fileToBeDecrypted, badSessionKey, _fileToDecryptAlgorithmDetails.Iv,
-                //        _fileToDecryptAlgorithmDetails.SubBlockSize);
-
-                //    File.WriteAllBytes(_fileToSaveDecryptedPath, fileDoneBad);
-                //}
-
-                // var deserializedKey = PrivateKeyFactory.CreateKey(privateKey);
-                // var privateKey = service.GetPrivateKey2(user);
-                ///  PrivateKeyInfo privateKeyInfo = PrivateKeyInfoFactory.CreatePrivateKeyInfo(privateKeyDecrypted);
-                // byte[] serializedPrivateBytes = privateKeyInfo.ToAsn1Object().GetDerEncoded();
-
-
-
-
-
+                MessageBox.Show("Odszyfrowano plik.");
 
             }
-
-
-
-
         }
 
         private void allowedUsersToDecryptComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //Console.WriteLine(allowedUsersToDecryptComboBox.SelectedItem.ToString());
-            //var selectedUser = allowedUsersToDecryptComboBox.SelectedItem.ToString();
-            //_userPrivateKey = System.IO.File.ReadAllBytes(Constants.PrivateKeysFolderPath + selectedUser);
-
-            //Console.WriteLine(_userPrivateKey);
-
         }
 
-        private void testButton_Click(object sender, RoutedEventArgs e)
-        {
-            var privatePath = Constants.PrivateKeysFolderPath + "test";
-
-            byte[] password = HashUtil.GenerateSha256Hash("test");
-            byte[] key = File.ReadAllBytes(privatePath);
-
-            //File.WriteAllBytes(privatePath, serializedPrivateBytes);
-
-            var pk = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, key, password, null, 0);
-            var enc = TwoFishUtils.TwoFishPrivateKeyDecryption(CipherModes.Ecb, pk, password, null, 0);
-            bool areEqual = key.SequenceEqual(enc);
-
-            if (areEqual)
-            {
-                Console.WriteLine("true");
-            }
-        }
 
         private void CipherModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

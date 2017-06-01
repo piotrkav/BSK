@@ -31,7 +31,7 @@ namespace BSK_Project
         public const string SessionKey = "SessionKey";
         public const string EncryptedFileHeader = "EncryptedFileHeader";
         public static int[] KeyLengths = { 128, 136, 144, 152, 160, 168, 176, 184, 192, 200, 208, 216, 224, 232, 240, 248, 256 };
-        public static int[] SubBlockSizes = { 8, 16, 32, 64 };
+        public static int[] SubBlockSizes = { 8, 16, 24, 32, 40, 48, 56, 64 };
         public const string TwoFish = "Twofish";
         public const string Content = "Content";
         public const string Rsa = "RSA";

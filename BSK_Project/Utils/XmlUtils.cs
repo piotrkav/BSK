@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Xml;
 using Org.BouncyCastle.Crypto.Paddings;
@@ -40,6 +42,7 @@ namespace BSK_Project.Utils
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();
+
 
             }
         }
@@ -87,30 +90,49 @@ namespace BSK_Project.Utils
                 }
                 writer.WriteEndElement();
 
-                writer.WriteElementString(Constants.Content,
-                    BitConverter.ToString(encryptedBytes).Replace("-", string.Empty));
+                //  writer.WriteElementString(Constants.Content,
+                //      BitConverter.ToString(encryptedBytes).Replace("-", string.Empty));
 
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();
+                writer.Close();
+
             }
+            byte STX = 0x02;
+            var contentWriter = new BinaryWriter(File.Open(fileName, FileMode.Append));
+            contentWriter.Write(STX);
+            contentWriter.Write(encryptedBytes);
+            contentWriter.Close();
         }
 
         public static AlgorithmDetails GetAlgorithmDetails(string fileName)
         {
             var details = new AlgorithmDetails();
             var allowedUserDictionary = new SortedDictionary<string, byte[]>();
+            var settings = new XmlWriterSettings
+            {
+                CheckCharacters = false
+
+            };
             try
             {
 
-                using (var reader = XmlReader.Create(fileName))
+
+                using (XmlReader reader = XmlReader.Create(fileName))
                 {
-                    int sizeInBytes = Encoding.ASCII.GetBytes(reader.ReadOuterXml()).Length;
                     while (reader.Read())
                     {
-           
+                        if (reader.Name == Constants.EncryptedFileHeader &&
+                            reader.NodeType == XmlNodeType.EndElement)
+                        {
+                            break;
+                        }
+
                         if (reader.NodeType == XmlNodeType.Element)
                         {
+                           
+
                             switch (reader.Name)
                             {
                                 case Constants.Algorithm:
@@ -153,7 +175,7 @@ namespace BSK_Project.Utils
                                     Console.WriteLine("Session Key " + reader.Value);
                                     var sessionKey = reader.Value;
                                     allowedUserDictionary.Add(email, Convert.FromBase64String(sessionKey));
-         
+
                                     break;
 
 
@@ -172,8 +194,8 @@ namespace BSK_Project.Utils
                     MessageBoxImage.Error);
                 return null;
             }
-           
-           
+
+
         }
 
         public static byte[] GetEncryptedContent(string fileName)
@@ -226,14 +248,24 @@ namespace BSK_Project.Utils
             }
         }
 
-        public static int getNumberOfBytesToSkip(byte[] inputFile)
+        public static byte[] GetContent(string fileName)
         {
+            var startOffset = GetNumberOfBytesToSkip(fileName);
+
+            var result = File.ReadAllBytes(fileName).Skip(startOffset).ToArray();
+            return result;
+        }
+        public static int GetNumberOfBytesToSkip(string fileName)
+        {
+            var inputFile = File.ReadAllBytes(fileName);
+
+
             byte STX = 0x02;
             int counter = 0;
             for (int i = 0; i < inputFile.Length; i++)
             {
                 counter++;
-                if(inputFile[i] == STX)
+                if (inputFile[i] == STX)
                 {
                     break;
                 }

@@ -56,6 +56,7 @@ namespace BSK_Project
         public byte[] GetEncryptedByRsaSessionKey(AsymmetricKeyParameter keyParameter, byte[] sessionKey)
         {
             var encryptEngine = new RsaEngine();
+            
             encryptEngine.Init(true, keyParameter);
             var encrypted = encryptEngine.ProcessBlock(sessionKey, 0, sessionKey.Length);
 

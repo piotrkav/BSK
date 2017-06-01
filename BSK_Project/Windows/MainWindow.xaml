@@ -4,6 +4,8 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BSK_Project"
+        xmlns:windows="clr-namespace:BSK_Project.Windows"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
         Title="Algorytm TwoFish" Height="480.5" Width="525">
     <Grid Margin="0,0,0,8">
@@ -31,7 +33,7 @@
                 </TabItem.Header>
 
                 <Label Margin="0,7,-18,-7" >
-                    <Grid>
+                    <Grid RenderTransformOrigin="0.563,1.659">
 
                         <GroupBox  x:Name="groupBox" Header="Plik" Height="83" Width="501" Grid.ColumnSpan="2">
                             <Grid>
@@ -89,10 +91,8 @@
 
                         </Label>
                         <Button x:Name="encryptButton" Content="Szyfruj" HorizontalAlignment="Left" Margin="21,323,0,-256" VerticalAlignment="Top" Width="90" Click="encryptButton_Click" RenderTransformOrigin="-0.406,2.3" />
-                        <ProgressBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="250" Margin="232,326,0,-259" RenderTransformOrigin="0.394,4.125"/>
 
-                        <Label x:Name="label4" Content="Stan szyfrowania" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="237,300,0,-239"/>
-                        <Button x:Name="testButton" Content="Test" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="131,323,0,-256" Click="testButton_Click"/>
+                        <Label x:Name="label4" Content="" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="242,317,0,-256"/>
                         <Label Margin="232,184,0,-231" Height="134" VerticalAlignment="Top" >
                             <GroupBox x:Name="choosenUsersGroupBox" Header="Wybrani użytkownicy" Height="112" Width="259">
                                 <Grid Margin="0,0,-39,0">
@@ -102,8 +102,7 @@
                             </GroupBox>
 
                         </Label>
-
-
+                        
                     </Grid>
 
 
@@ -134,6 +133,7 @@
 
 
                             </Grid>
+                           
                         </GroupBox>
                         <GroupBox  x:Name="groupBox45" Header="Użytkownik" Margin="0,109,0,-103">
                             <Grid Margin="0,0,-12,-2">
@@ -141,27 +141,25 @@
                                 <Label x:Name="EnterPasswordLabel" Content="Wpisz hasło:" HorizontalAlignment="Left" VerticalAlignment="Top" Width="115" Margin="156,0,0,0"/>
                                 <ComboBox x:Name="allowedUsersToDecryptComboBox" SelectedIndex="0" HorizontalAlignment="Left" Margin="10,31,0,0" VerticalAlignment="Top" Width="120" SelectionChanged="allowedUsersToDecryptComboBox_SelectionChanged">
                                 </ComboBox>
-                                <PasswordBox x:Name="passwordToDecryptBox" ToolTip="Twoje hasło" VerticalAlignment="Center" Margin="161,33,178,8" Height="20"/>
+                                <PasswordBox x:Name="passwordToDecryptBox" ToolTip="Twoje hasło" VerticalAlignment="Center" Margin="156,31,183,49" Height="20"/>
 
 
                             </Grid>
-
+                         
+                            
                         </GroupBox>
                         <Grid Margin="0,205,0,-205">
                             <Button x:Name="DecryptButton" Content="Odszyfruj" HorizontalAlignment="Left" Margin="10,62,0,0" VerticalAlignment="Top" Width="90" Click="DecryptButton_Click_1"  />
-                            <ProgressBar HorizontalAlignment="Left" Height="20" VerticalAlignment="Top" Width="250" Margin="10,31,0,0"/>
-                            <Label x:Name="ProgressOfDecryptLabel" Content="Stan odszyfrowania" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="10,0,0,0" Width="117"/>
-                            <Button x:Name="CancelButton" Content="Anuluj" HorizontalAlignment="Left" VerticalAlignment="Top" Width="80" Margin="117,62,0,0"/>
-
+                           
                         </Grid>
-
+                       
 
 
                     </Grid>
                 </Label>
 
             </TabItem>
-
+           
 
         </TabControl>
 
