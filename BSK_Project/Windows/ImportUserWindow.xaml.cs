@@ -12,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using BSK_Project.Utils;
 using Microsoft.Win32;
 using Path = System.IO.Path;
 
@@ -47,7 +48,17 @@ namespace BSK_Project.Windows
                 var newKey = Constants.PublicKeysFolderPath + name;
                 if (!File.Exists(newKey))
                 {
-                    File.Copy(_publicKeyPath, Constants.PublicKeysFolderPath + name);
+                    if (XmlUtils.CheckIfProperKey(_publicKeyPath))
+                    {
+                        File.Copy(_publicKeyPath, Constants.PublicKeysFolderPath + name);
+                        Close();
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Nie można zaimportować klucza, plik ma złą strukturę", "Import", MessageBoxButton.OK, MessageBoxImage.Error);
+
+                    }
 
                 }
                 else

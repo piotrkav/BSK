@@ -60,7 +60,6 @@ namespace BSK_Project
             encryptEngine.Init(true, keyParameter);
             var encrypted = encryptEngine.ProcessBlock(sessionKey, 0, sessionKey.Length);
 
-
             sessionKey = null;
 
             return encrypted;

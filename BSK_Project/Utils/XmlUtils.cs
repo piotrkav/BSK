@@ -1,14 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Xml;
-using Org.BouncyCastle.Crypto.Paddings;
 using static BSK_Project.CipherMode;
-using System.Text;
 
 namespace BSK_Project.Utils
 {
@@ -29,16 +25,14 @@ namespace BSK_Project.Utils
 
                 writer.WriteStartDocument();
                 writer.WriteStartElement(Constants.Key);
-                writer.WriteElementString(Constants.User, details.User);
                 writer.WriteElementString(Constants.Algorithm, details.Algorithm);
                 writer.WriteElementString(Constants.KeyType, details.Type);
-                if (details.Modulus != null)
-                {
-                    writer.WriteElementString(Constants.Modulus, Convert.ToBase64String(details.Modulus));
-                    writer.WriteElementString(Constants.Exponent, Convert.ToBase64String(details.Exponent));
-                }
-                writer.WriteElementString(Constants.KeyValue,
-                    BitConverter.ToString(details.Content).Replace("-", string.Empty));
+
+                writer.WriteStartElement(Constants.KeyValue);
+                writer.WriteAttributeString("system", "hex");
+                writer.WriteValue(BitConverter.ToString(details.Content).Replace("-", string.Empty));
+                writer.WriteEndElement();
+
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();
@@ -46,7 +40,6 @@ namespace BSK_Project.Utils
 
             }
         }
-
         public static void CreateXml(string fileName, AlgorithmDetails details, byte[] encryptedBytes)
         {
 
@@ -89,37 +82,26 @@ namespace BSK_Project.Utils
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
-
-                //  writer.WriteElementString(Constants.Content,
-                //      BitConverter.ToString(encryptedBytes).Replace("-", string.Empty));
-
                 writer.WriteEndElement();
                 writer.WriteEndDocument();
                 writer.Flush();
                 writer.Close();
 
             }
-            byte STX = 0x02;
+            const byte stx = 0x02;
             var contentWriter = new BinaryWriter(File.Open(fileName, FileMode.Append));
-            contentWriter.Write(STX);
+            contentWriter.Write(stx);
             contentWriter.Write(encryptedBytes);
             contentWriter.Close();
         }
-
         public static AlgorithmDetails GetAlgorithmDetails(string fileName)
         {
             var details = new AlgorithmDetails();
             var allowedUserDictionary = new SortedDictionary<string, byte[]>();
-            var settings = new XmlWriterSettings
-            {
-                CheckCharacters = false
 
-            };
             try
             {
-
-
-                using (XmlReader reader = XmlReader.Create(fileName))
+                using (var reader = XmlReader.Create(fileName))
                 {
                     while (reader.Read())
                     {
@@ -129,58 +111,42 @@ namespace BSK_Project.Utils
                             break;
                         }
 
-                        if (reader.NodeType == XmlNodeType.Element)
+                        if (reader.NodeType != XmlNodeType.Element) continue;
+                        switch (reader.Name)
                         {
-                           
+                            case Constants.Algorithm:
+                                reader.Read();
+                                details.Algorithm = reader.Value;
+                                break;
+                            case Constants.BlockSize:
+                                reader.Read();
+                                details.BlockSize = Convert.ToInt32(reader.Value);
+                                break;
+                            case Constants.SubBlockSize:
+                                reader.Read();
+                                details.SubBlockSize = Convert.ToInt32(reader.Value);
+                                break;
+                            case Constants.KeySize:
+                                reader.Read();
+                                details.KeySize = Convert.ToInt32(reader.Value);
+                                break;
+                            case Constants.CipherMode:
+                                reader.Read();
+                                details.CipherMode = GetEnum(reader.Value);
+                                break;
+                            case Constants.IV:
+                                reader.Read();
+                                details.Iv = Convert.FromBase64String(reader.Value);
+                                break;
+                            case Constants.Email:
+                                reader.Read();
+                                var email = reader.Value;
 
-                            switch (reader.Name)
-                            {
-                                case Constants.Algorithm:
-                                    reader.Read();
-                                    details.Algorithm = reader.Value;
-                                    Console.WriteLine("Algorithm " + reader.Value);
-                                    break;
-                                case Constants.BlockSize:
-                                    reader.Read(); //this moves reader to next node which is text 
-                                    details.BlockSize = Convert.ToInt32(reader.Value);
-                                    Console.WriteLine("BlockSize " + reader.Value);
-                                    break;
-                                case Constants.SubBlockSize:
-                                    reader.Read(); //this moves reader to next node which is text 
-                                    details.SubBlockSize = Convert.ToInt32(reader.Value);
-                                    Console.WriteLine("SubBlockSize " + reader.Value);
-                                    break;
-                                case Constants.KeySize:
-                                    reader.Read();
-                                    details.KeySize = Convert.ToInt32(reader.Value);
-                                    Console.WriteLine("KeySize " + reader.Value);
-                                    break;
-                                case Constants.CipherMode:
-                                    reader.Read();
-                                    details.CipherMode = GetEnum(reader.Value);
-                                    Console.WriteLine("CipherMode " + reader.Value);
-                                    break;
-                                case Constants.IV:
-                                    reader.Read();
-                                    details.Iv = Convert.FromBase64String(reader.Value);
-                                    Console.WriteLine("Iv " + reader.Value);
-                                    break;
-                                case Constants.Email:
-                                    reader.Read();
-                                    Console.WriteLine(reader.Value);
-                                    var email = reader.Value;
-
-                                    reader.ReadToFollowing(Constants.SessionKey);
-                                    reader.Read();
-                                    Console.WriteLine("Session Key " + reader.Value);
-                                    var sessionKey = reader.Value;
-                                    allowedUserDictionary.Add(email, Convert.FromBase64String(sessionKey));
-
-                                    break;
-
-
-                            }
-
+                                reader.ReadToFollowing(Constants.SessionKey);
+                                reader.Read();
+                                var sessionKey = reader.Value;
+                                allowedUserDictionary.Add(email, Convert.FromBase64String(sessionKey));
+                                break;
                         }
                     }
                 }
@@ -197,56 +163,61 @@ namespace BSK_Project.Utils
 
 
         }
-
-        public static byte[] GetEncryptedContent(string fileName)
-        {
-
-
-            using (var reader = XmlReader.Create(fileName))
-            {
-                while (reader.Read())
-                {
-                    if (reader.NodeType == XmlNodeType.Element)
-                    {
-                        if (reader.Name.Equals(Constants.Content))
-                        {
-                            reader.Read();
-                            int size = reader.Value.Length;
-                            byte[] result = new byte[size / 2];
-                            reader.ReadContentAsBinHex(result, 0, size / 2);
-                            return result;
-
-
-                        }
-                    }
-                }
-                return null;
-            }
-        }
-
         public static byte[] GetKey(string fileName)
         {
             using (var reader = XmlReader.Create(fileName))
             {
                 while (reader.Read())
                 {
-                    if (reader.NodeType == XmlNodeType.Element)
+                    if (reader.NodeType != XmlNodeType.Element) continue;
+                    if (reader.Name.Equals(Constants.KeyValue))
                     {
-                        if (reader.Name.Equals(Constants.KeyValue))
-                        {
-                            reader.Read();
-                            int size = reader.Value.Length;
-                            byte[] result = new byte[size / 2];
-                            reader.ReadContentAsBinHex(result, 0, size / 2);
-                            return result;
+                        reader.Read();
+                        var size = reader.Value.Length;
+                        var result = new byte[size / 2];
+                        reader.ReadContentAsBinHex(result, 0, size / 2);
+                        return result;
 
 
-                        }
                     }
                 }
                 return null;
             }
         }
+
+        public static bool CheckIfProperKey(string fileName)
+        {
+            try
+            {
+                using (var reader = XmlReader.Create(fileName))
+                {
+                    while (reader.Read())
+                    {
+                        if (reader.NodeType != XmlNodeType.Element) continue;
+                        switch (reader.Name)
+                        {
+                            case Constants.Key:
+                                break;
+                            case Constants.Algorithm:
+                                break;
+                            case Constants.KeyType:
+                                break;
+                            case Constants.KeyValue:
+                                break;
+                            default:
+                                return false;
+                        }
+                    }
+                    return true;
+                }
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+
 
         public static byte[] GetContent(string fileName)
         {
@@ -258,45 +229,17 @@ namespace BSK_Project.Utils
         public static int GetNumberOfBytesToSkip(string fileName)
         {
             var inputFile = File.ReadAllBytes(fileName);
-
-
-            byte STX = 0x02;
-            int counter = 0;
-            for (int i = 0; i < inputFile.Length; i++)
+            const byte stx = 0x02;
+            var counter = 0;
+            foreach (var t in inputFile)
             {
                 counter++;
-                if (inputFile[i] == STX)
+                if (t == stx)
                 {
                     break;
                 }
             }
             return counter;
-        }
-
-        //private static byte[] StringToByteArray(string hex)
-        //{
-        //    if (hex.Length % 2 == 1)
-        //        throw new Exception("The binary key cannot have an odd number of digits");
-
-        //    byte[] arr = new byte[hex.Length >> 1];
-
-        //    for (int i = 0; i < hex.Length >> 1; ++i)
-        //    {
-        //        arr[i] = (byte)((GetHexVal(hex[i << 1]) << 4) + (GetHexVal(hex[(i << 1) + 1])));
-        //    }
-
-        //    return arr;
-        //}
-
-        private static int GetHexVal(char hex)
-        {
-            int val = (int)hex;
-            //For uppercase A-F letters:
-            return val - (val < 58 ? 48 : 55);
-            //For lowercase a-f letters:
-            //return val - (val < 58 ? 48 : 87);
-            //Or the two combined, but a bit slower:
-            //return val - (val < 58 ? 48 : (val < 97 ? 55 : 87));
         }
         private static CipherModes GetEnum(string value)
         {

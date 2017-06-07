@@ -49,7 +49,6 @@ namespace BSK_Project
                     byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
                     int len = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
                     len += cipher.DoFinal(temp, len);
-
                     result = TransferBytes(len, temp);
                     //cipher.ProcessBytes(input);
                     //return cipher.DoFinal(input);
@@ -60,12 +59,6 @@ namespace BSK_Project
             catch (Exception e)
             {
                 return null;
-
-                // return BouncyCastleCrypto(for);
-                //FileEncryptionService service = new FileEncryptionService();
-                //var sk = service.GenerateKey(key.Length*Constants.ByteSize);
-
-                //return BouncyCastleCrypto(false, mode, input, sk, iv, subLength);
             }
 
 
@@ -106,18 +99,9 @@ namespace BSK_Project
             byte[] result = null;
             var cipher = CipherUtils.CreateTwofishCipher(forEncrypt, mode, key, iv, subLength);
             int len = 0;
-           // forEncrypt = error;
+            // forEncrypt = error;
 
-            if (forEncrypt)
-            {
-
-                result = GetBouncyBytes(true, input, cipher);
-            }
-            else
-            {
-                result = GetBouncyBytes(false, input, cipher);
-
-            }
+            result = GetBouncyBytes(forEncrypt, input, cipher);
             return result;
 
 
@@ -137,15 +121,18 @@ namespace BSK_Project
             else
             {
                 byte[] _in = input;
+                int size = _in.Length;
+                int len2 = 0;
                 byte[] temp = new byte[cipher.GetOutputSize(_in.Length)];
-                int len2 = cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
-                return TransferBytes(len2, temp);
+
+                while (len2 == 0)
+                {
+                    len2 += cipher.ProcessBytes(_in, 0, _in.Length, temp, 0);
+                }
+                return TransferBytes(size, temp);
 
 
             }
-
-
-            // cipher.DoFinal(_out, len1);
         }
 
         public byte[] Decrypt(CipherModes mode, byte[] plain, byte[] key, byte[] iv, int subLength, bool error)

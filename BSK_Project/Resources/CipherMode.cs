@@ -7,8 +7,7 @@ using System.Threading.Tasks;
 namespace BSK_Project
 {
    public class CipherMode
-    {
-        public enum CipherModes
+    {        public enum CipherModes
         {
             Ecb,
             Cfb,

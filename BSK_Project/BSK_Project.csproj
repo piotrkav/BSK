@@ -5,7 +5,7 @@
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{2A6DBA2C-91A6-47E5-A1AE-DADC9578E038}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <OutputType>WinExe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BSK_Project</RootNamespace>
     <AssemblyName>BSK_Project</AssemblyName>
@@ -74,7 +74,6 @@
     <Compile Include="Windows\CreateUserWindow.xaml.cs">
       <DependentUpon>CreateUserWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Services\DeleteUserService.cs" />
     <Compile Include="Services\FileEncryptionService.cs" />
     <Compile Include="Utils\HashUtil.cs" />
     <Compile Include="Utils\TwoFishUtils.cs" />

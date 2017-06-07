@@ -24,6 +24,7 @@ namespace BSK_Project.Utils
             var keyParameter = new KeyParameter(key);
             if (iv == null)
             {
+
                 var fileEncryptionService =new FileEncryptionService();
                 iv = fileEncryptionService.GenerateKey(128);
             }

@@ -23,7 +23,7 @@ namespace BSK_Project
     public class UserCreateService
     {
         private readonly string _email;
-        private byte[] _password;
+        private readonly byte[] _password;
 
         public string GetEmail() => _email;
         public byte[] GetPassword() => _password;
@@ -48,11 +48,6 @@ namespace BSK_Project
             byte[] serializedPublicBytes = publicKeyInfo.ToAsn1Object().GetDerEncoded();
             string serializedPublic = Convert.ToBase64String(serializedPublicBytes);
 
-            RsaKeyParameters publicKey = (RsaKeyParameters)keys.Public;
-            var modulus = publicKey.Modulus.ToByteArray();
-            var exponent = publicKey.Exponent.ToByteArray();
-
-
             //paths
             var publicPath = Constants.PublicKeysFolderPath + _email;
             var privatePath = Constants.PrivateKeysFolderPath + _email;
@@ -62,57 +57,15 @@ namespace BSK_Project
                 MessageBox.Show("Użytkownik o takiej nazwie już istnieje", "Tworzenie użytkownika", MessageBoxButton.OK, MessageBoxImage.Exclamation); return;
             }
             //save keys to files
-
-            KeyDetails publicKeyDetails = new KeyDetails(Constants.Rsa, Constants.PublicType, _email, serializedPublicBytes, modulus,exponent);
+            KeyDetails publicKeyDetails = new KeyDetails(Constants.Rsa, Constants.PublicType,
+                serializedPublicBytes);
             XmlUtils.CreateXmlKey(publicPath, publicKeyDetails);
 
             var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0);
-            KeyDetails privateKeyDetails = new KeyDetails(Constants.Rsa, Constants.PrivateType, _email, privateKey,null,null);
+            KeyDetails privateKeyDetails = new KeyDetails(Constants.Rsa, Constants.PrivateType, privateKey);
             XmlUtils.CreateXmlKey(privatePath, privateKeyDetails);
 
-            //var privateKey = TwoFishUtils.TwoFishPrivateKeyEncryption(CipherModes.Ecb, serializedPrivateBytes, _password, null, 0
-            // Console.WriteLine(" privateKey 1");
-            // Console.WriteLine(Convert.ToBase64String(privateKey));
-            // var key22 =  PrivateKeyFactory.CreateKey(privateKey);
-            //privateKey = null;
-            // Console.WriteLine("private key" + serializedPrivate);
-            // privateKey = null;
-            //TwoFishUtils.ConvertKeyToString(publicKey));
-            // 
-
-
-            //CHECK OF READING KEYS FROM FILES
-
-            //var puk = File.ReadAllBytes(publicPath);
-            //AsymmetricKeyParameter deserializedKey1 = PublicKeyFactory.CreateKey(puk);
-            //         var puk2 = File.ReadAllBytes(privatePath);
-            //       FileEncryptionService service = new FileEncryptionService();
-            //  var x =  service.GetPrivateKey2(_email);
-
-            //     AsymmetricKeyParameter deserializedKey2 = PrivateKeyFactory.CreateKey(puk2);
-            //if (keys.Public.Equals(deserializedKey1))
-            //{
-            //    Console.WriteLine("TRUE");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("FALSE");
-            //}
-            //if (keys.Private.Equals(deserializedKey2))
-            //{
-            //    Console.WriteLine("true");
-            //}
-            //else
-            //{
-            //    Console.WriteLine("false");
-            //}
-
-
         }
-
-
-
-
 
         public AsymmetricCipherKeyPair GetKeyPair(int rsaKeySize)
         {

@@ -11,6 +11,7 @@ using Org.BouncyCastle.Pkcs;
 using Org.BouncyCastle.Security;
 using System.Linq;
 using System.Security.Policy;
+using System.Windows.Documents;
 using System.Windows.Input;
 using BSK_Project.Windows;
 using Org.BouncyCastle.Crypto;
@@ -38,7 +39,7 @@ namespace BSK_Project
         byte[] _encryptedFile;
         byte[] _fileToBeDecrypted;
 
-        public MainWindow()
+            public MainWindow()
         {
 
             InitializeComponent();
@@ -159,8 +160,8 @@ namespace BSK_Project
             var result = dlg.ShowDialog();
             if (result != true) return;
 
+            allowedUsersToDecryptComboBox.Items.Clear();
             _fileToDecryptPath = dlg.FileName;
-            int x = XmlUtils.GetNumberOfBytesToSkip(_fileToDecryptPath);
             _fileToDecryptAlgorithmDetails = XmlUtils.GetAlgorithmDetails(_fileToDecryptPath);
             if (_fileToDecryptAlgorithmDetails != null)
             {
@@ -182,7 +183,7 @@ namespace BSK_Project
                 }
 
 
-
+                allowedUsersToDecryptComboBox.SelectedIndex = 0;
                 _fileToBeDecrypted = XmlUtils.GetContent(_fileToDecryptPath);
 
             }
@@ -203,23 +204,28 @@ namespace BSK_Project
         {
             CreateUserWindow createUserWindow = new CreateUserWindow(userListBox);
             createUserWindow.Show();
-
-
         }
 
         private void deleteUserButton_Click(object sender, RoutedEventArgs e)
         {
+
             var userToDelete = userListBox.SelectedItem;
+            if (choosenUserListBox.Items.Contains(userToDelete))
+            {
+                MessageBox.Show("Nie można usunąć użytkownika wybranego do szyfrowania!", "Błąd usuwania", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                return;
+
+            }
+            var x = choosenUserListBox.Items.OfType<ComboBoxItem>()
+                .Any(cbi => cbi.Content.Equals(userToDelete));
             if (userToDelete != null)
             {
-                label4.Content = userToDelete;
                 UserDeleteService userDeleteService = new UserDeleteService(userListBox, userToDelete);
                 userDeleteService.DeleteFullUserInfo();
             }
             else
             {
-                MessageBox.Show("Nie wybrano użytkownika", "Błąd usuwania", MessageBoxButton.OK, MessageBoxImage.Exclamation);
-
+                MessageBox.Show("Nie wybrano użytkownika!", "Błąd usuwania", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             }
         }
 
@@ -272,9 +278,15 @@ namespace BSK_Project
                 catch (Exception ex)
                 {
 
+                    int size = _fileToDecryptAlgorithmDetails.KeySize / 8;
+                    var hashedBad = new byte[size];
 
+                    for (int i = 0; i < size; i++)
+                    {
+                        hashedBad[i] = passwordHashed[i];
+                    }
                     var fileDone = TwoFishUtils.TwoFishFileDecryption(_fileToDecryptAlgorithmDetails.CipherMode,
-                        _fileToBeDecrypted, passwordHashed, _fileToDecryptAlgorithmDetails.Iv,
+                        _fileToBeDecrypted, hashedBad, _fileToDecryptAlgorithmDetails.Iv,
                         _fileToDecryptAlgorithmDetails.SubBlockSize, true);
                     if (fileDone != null)
                         File.WriteAllBytes(_fileToSaveDecryptedPath, fileDone);

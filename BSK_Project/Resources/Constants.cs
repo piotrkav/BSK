@@ -16,7 +16,6 @@ namespace BSK_Project
 
         public static string PrivateKeysFolderPath =
             Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..\\..\\private_keys\\"));
-
         public const int ByteSize = 8;
         public const string Algorithm = "Algorithm";
         public const string KeySize = "KeySize";
